@@ -1,0 +1,258 @@
+{% doc %}
+  @prompt
+    i want to put in a video that plays automatically on a loop and i want it to be in proportion to the other blocks , i need an option to add the video , i also need to be able to adjust the sizing i want it to be flush with the top block, please just make it so it sits flush with the top block image and that it is touching both sides of the width 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-video-block-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ai-video-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: {{ block.settings.aspect_ratio }}%;
+    overflow: hidden;
+    border-radius: {{ block.settings.border_radius }}px;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-video-element-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: {{ block.settings.video_fit }};
+  }
+
+  .ai-video-placeholder-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f4;
+  }
+
+  .ai-video-placeholder-{{ ai_gen_id }} svg {
+    width: 80px;
+    height: 80px;
+    opacity: 0.3;
+  }
+
+  .ai-video-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+{% endstyle %}
+
+<auto-loop-video-{{ ai_gen_id }}
+  class="ai-video-block-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-video-wrapper-{{ ai_gen_id }}">
+    {% liquid
+      assign video_source = null
+      
+      if block.settings.video_file != blank
+        assign video_source = block.settings.video_file
+      elsif block.settings.video_url != blank
+        assign video_source = block.settings.video_url
+      endif
+    %}
+
+    {% if video_source != blank %}
+      <video
+        class="ai-video-element-{{ ai_gen_id }}"
+        autoplay
+        loop
+        muted
+        playsinline
+        {% if block.settings.show_controls %}
+          controls
+        {% endif %}
+      >
+        {% if block.settings.video_file != blank %}
+          {% for source in block.settings.video_file.sources %}
+            <source src="{{ source.url }}" type="{{ source.mime_type }}">
+          {% endfor %}
+        {% else %}
+          <source src="{{ block.settings.video_url }}" type="video/mp4">
+        {% endif %}
+        Your browser does not support the video tag.
+      </video>
+    {% else %}
+      <div class="ai-video-placeholder-{{ ai_gen_id }}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        <div class="ai-video-empty-state-{{ ai_gen_id }}">
+          Next, upload a video or add a video URL
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</auto-loop-video-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class AutoLoopVideo{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.video = this.querySelector('.ai-video-element-{{ ai_gen_id }}');
+        
+        if (this.video) {
+          this.ensureAutoplay();
+        }
+      }
+
+      ensureAutoplay() {
+        this.video.addEventListener('loadedmetadata', () => {
+          this.video.play().catch((error) => {
+            console.log('Autoplay prevented:', error);
+          });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              this.video.play().catch((error) => {
+                console.log('Play prevented:', error);
+              });
+            } else {
+              this.video.pause();
+            }
+          });
+        }, { threshold: 0.5 });
+
+        observer.observe(this.video);
+      }
+    }
+
+    customElements.define('auto-loop-video-{{ ai_gen_id }}', AutoLoopVideo{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Autoplay video",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "type": "video",
+      "id": "video_file",
+      "label": "Video file"
+    },
+    {
+      "type": "paragraph",
+      "content": "Or use a video URL below (video file takes priority)"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_controls",
+      "label": "Show controls",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "video_fit",
+      "label": "Video fit",
+      "options": [
+        {
+          "value": "cover",
+          "label": "Cover"
+        },
+        {
+          "value": "contain",
+          "label": "Contain"
+        },
+        {
+          "value": "fill",
+          "label": "Fill"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Aspect ratio",
+      "options": [
+        {
+          "value": "56.25",
+          "label": "16:9"
+        },
+        {
+          "value": "75",
+          "label": "4:3"
+        },
+        {
+          "value": "100",
+          "label": "1:1"
+        },
+        {
+          "value": "125",
+          "label": "4:5"
+        },
+        {
+          "value": "177.78",
+          "label": "9:16"
+        }
+      ],
+      "default": "56.25"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Autoplay video"
+    }
+  ]
+}
+{% endschema %}

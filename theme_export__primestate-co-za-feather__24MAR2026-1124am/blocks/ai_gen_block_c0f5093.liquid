@@ -1,0 +1,406 @@
+{% doc %}
+  @prompt
+    i want to put a short video in this section, please include a funtion so that i can actually add a video to this 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-video-block-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-video-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: {{ block.settings.aspect_ratio }}%;
+    background-color: {{ block.settings.background_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+  }
+
+  .ai-video-iframe-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .ai-video-native-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-video-placeholder-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f0f4;
+    color: #110811;
+    gap: 16px;
+  }
+
+  .ai-video-placeholder-icon-{{ ai_gen_id }} {
+    width: 64px;
+    height: 64px;
+    opacity: 0.3;
+  }
+
+  .ai-video-placeholder-text-{{ ai_gen_id }} {
+    font-size: 14px;
+    color: #110811;
+    opacity: 0.6;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .ai-video-content-{{ ai_gen_id }} {
+    text-align: {{ block.settings.text_alignment }};
+    margin-top: {{ block.settings.content_spacing }}px;
+  }
+
+  .ai-video-heading-{{ ai_gen_id }} {
+    color: {{ block.settings.heading_color }};
+    margin: 0 0 12px 0;
+    font-size: {{ block.settings.heading_size }}px;
+  }
+
+  .ai-video-description-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.text_size }}px;
+    line-height: 1.6;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-video-block-{{ ai_gen_id }} {
+      width: 100%;
+    }
+
+    .ai-video-heading-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.heading_size }}px * 0.8);
+    }
+
+    .ai-video-description-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.text_size }}px * 0.9);
+    }
+  }
+{% endstyle %}
+
+<video-block-{{ ai_gen_id }}
+  class="ai-video-block-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-video-wrapper-{{ ai_gen_id }}">
+    {% if block.settings.video_file != blank %}
+      {{ block.settings.video_file | video_tag:
+        autoplay: block.settings.autoplay,
+        loop: block.settings.loop,
+        controls: block.settings.show_controls,
+        muted: block.settings.mute,
+        class: 'ai-video-native-' | append: ai_gen_id
+      }}
+    {% elsif block.settings.video_url != blank %}
+      {% liquid
+        assign video_url = block.settings.video_url
+        assign video_id = ''
+        assign video_provider = ''
+
+        if video_url contains 'youtube.com' or video_url contains 'youtu.be'
+          assign video_provider = 'youtube'
+          if video_url contains 'youtu.be/'
+            assign video_id = video_url | split: 'youtu.be/' | last | split: '?' | first
+          elsif video_url contains 'watch?v='
+            assign video_id = video_url | split: 'watch?v=' | last | split: '&' | first
+          elsif video_url contains 'embed/'
+            assign video_id = video_url | split: 'embed/' | last | split: '?' | first
+          endif
+        elsif video_url contains 'vimeo.com'
+          assign video_provider = 'vimeo'
+          assign video_id = video_url | split: 'vimeo.com/' | last | split: '/' | first
+        endif
+      %}
+
+      {% if video_provider == 'youtube' and video_id != blank %}
+        <iframe
+          class="ai-video-iframe-{{ ai_gen_id }}"
+          src="https://www.youtube.com/embed/{{ video_id }}?rel=0&modestbranding=1&controls={{ block.settings.show_controls | default: 1 }}&autoplay={{ block.settings.autoplay | default: 0 }}&mute={{ block.settings.mute | default: 0 }}&loop={{ block.settings.loop | default: 0 }}&playlist={{ video_id }}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+      {% elsif video_provider == 'vimeo' and video_id != blank %}
+        <iframe
+          class="ai-video-iframe-{{ ai_gen_id }}"
+          src="https://player.vimeo.com/video/{{ video_id }}?controls={{ block.settings.show_controls | default: 1 }}&autoplay={{ block.settings.autoplay | default: 0 }}&muted={{ block.settings.mute | default: 0 }}&loop={{ block.settings.loop | default: 0 }}"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+      {% else %}
+        <div class="ai-video-placeholder-{{ ai_gen_id }}">
+          <svg
+            class="ai-video-placeholder-icon-{{ ai_gen_id }}"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <div class="ai-video-placeholder-text-{{ ai_gen_id }}">
+            Invalid video URL. Please use a YouTube or Vimeo link.
+          </div>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="ai-video-placeholder-{{ ai_gen_id }}">
+        <svg
+          class="ai-video-placeholder-icon-{{ ai_gen_id }}"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        <div class="ai-video-placeholder-text-{{ ai_gen_id }}">
+          Next, upload a video file or add a video URL
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if block.settings.show_content %}
+    <div class="ai-video-content-{{ ai_gen_id }}">
+      {% if block.settings.heading != blank %}
+        <h3 class="ai-video-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h3>
+      {% endif %}
+
+      {% if block.settings.description != blank %}
+        <div class="ai-video-description-{{ ai_gen_id }}">
+          {{ block.settings.description }}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</video-block-{{ ai_gen_id }}>
+
+{% schema %}
+{
+  "name": "Video",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "type": "video",
+      "id": "video_file",
+      "label": "Video file"
+    },
+    {
+      "type": "paragraph",
+      "content": "Upload a video file or use a URL below"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video URL"
+    },
+    {
+      "type": "paragraph",
+      "content": "Supports YouTube and Vimeo URLs. Video file takes priority if both are set."
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Aspect ratio",
+      "options": [
+        {
+          "value": "56.25",
+          "label": "16:9"
+        },
+        {
+          "value": "75",
+          "label": "4:3"
+        },
+        {
+          "value": "100",
+          "label": "1:1"
+        },
+        {
+          "value": "125",
+          "label": "4:5"
+        }
+      ],
+      "default": "56.25"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f4f0f4"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Video settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "mute",
+      "label": "Mute",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_controls",
+      "label": "Show controls",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_content",
+      "label": "Show content",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "content_spacing",
+      "label": "Content spacing",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Content style"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#110811"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#110811"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video"
+    }
+  ]
+}
+{% endschema %}

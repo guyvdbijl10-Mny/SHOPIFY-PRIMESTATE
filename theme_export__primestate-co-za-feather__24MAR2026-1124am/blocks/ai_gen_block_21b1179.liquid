@@ -1,0 +1,705 @@
+{% doc %}
+  @prompt
+    Create a custom section with adjustable padding controls for all four sides (top, bottom, left, right) that can be adjusted independently for mobile only. Include an image upload field and text content area. The section should be mobile-responsive with clean, minimal design suitable for health supplement products., put the text over the image and use the image as the backround for the text , i want to be able to make the text of the heading bold and adjust fonts. i need a heading section and a body section. i also need a section at the bottom for email address and sign up with a line running underneath it , i need to be able to edit the padding of the whole section, it keeps only affecting the padding of the text and i want to change the padding of the box, i need to add radius to the section , i need adustable padding conrols for the section, top,bottom,left,right
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-hero-section-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    display: block;
+    overflow: hidden;
+    min-height: {{ block.settings.section_min_height }}px;
+    border-radius: {{ block.settings.section_border_radius }}px;
+    padding-top: {{ block.settings.section_padding_top }}px;
+    padding-bottom: {{ block.settings.section_padding_bottom }}px;
+    padding-left: {{ block.settings.section_padding_left }}px;
+    padding-right: {{ block.settings.section_padding_right }}px;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__background-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__background-placeholder svg {
+    width: 100%;
+    height: 100%;
+    max-width: 500px;
+    max-height: 500px;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: {{ block.settings.overlay_color }};
+    opacity: {{ block.settings.overlay_opacity }};
+    z-index: 1;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__content-wrapper {
+    position: relative;
+    z-index: 2;
+    padding-top: {{ block.settings.padding_top_mobile }}px;
+    padding-bottom: {{ block.settings.padding_bottom_mobile }}px;
+    padding-left: {{ block.settings.padding_left_mobile }}px;
+    padding-right: {{ block.settings.padding_right_mobile }}px;
+    display: flex;
+    flex-direction: column;
+    align-items: {{ block.settings.text_alignment }};
+    text-align: {{ block.settings.text_alignment }};
+    min-height: {{ block.settings.section_min_height }}px;
+    justify-content: center;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__heading {
+    color: {{ block.settings.heading_color }};
+    font-size: {{ block.settings.heading_size_mobile }}px;
+    font-weight: {{ block.settings.heading_weight }};
+    margin: 0 0 {{ block.settings.heading_spacing }}px 0;
+    max-width: 100%;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__body {
+    color: {{ block.settings.body_color }};
+    font-size: {{ block.settings.body_size_mobile }}px;
+    line-height: 1.5;
+    margin: 0 0 {{ block.settings.body_spacing }}px 0;
+    max-width: 100%;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__signup-wrapper {
+    width: 100%;
+    max-width: {{ block.settings.signup_max_width }}px;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__input {
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    border-bottom: {{ block.settings.input_border_width }}px solid {{ block.settings.input_border_color }};
+    background-color: {{ block.settings.input_background }};
+    color: {{ block.settings.input_text_color }};
+    font-size: {{ block.settings.input_font_size }}px;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__input::placeholder {
+    color: {{ block.settings.input_placeholder_color }};
+    opacity: 0.7;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__input:focus {
+    outline: none;
+    border-bottom-color: {{ block.settings.input_focus_color }};
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__button {
+    padding: 14px 32px;
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    border: none;
+    cursor: pointer;
+    font-size: {{ block.settings.button_font_size }}px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    border-radius: {{ block.settings.button_border_radius }}px;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__button:hover {
+    background-color: {{ block.settings.button_hover_background }};
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__success {
+    color: {{ block.settings.success_color }};
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  .ai-hero-section-{{ ai_gen_id }}__error {
+    color: {{ block.settings.error_color }};
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .ai-hero-section-{{ ai_gen_id }}__heading {
+      font-size: {{ block.settings.heading_size_desktop }}px;
+    }
+
+    .ai-hero-section-{{ ai_gen_id }}__body {
+      font-size: {{ block.settings.body_size_desktop }}px;
+    }
+  }
+{% endstyle %}
+
+<hero-section-{{ ai_gen_id }}
+  class="ai-hero-section-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-hero-section-{{ ai_gen_id }}__background">
+    {% if block.settings.background_image %}
+      <img
+        src="{{ block.settings.background_image | image_url: width: 2000 }}"
+        alt="{{ block.settings.background_image.alt | escape }}"
+        loading="lazy"
+        width="{{ block.settings.background_image.width }}"
+        height="{{ block.settings.background_image.height }}"
+      >
+    {% else %}
+      <div class="ai-hero-section-{{ ai_gen_id }}__background-placeholder">
+        {{ 'hero-apparel-1' | placeholder_svg_tag }}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="ai-hero-section-{{ ai_gen_id }}__overlay"></div>
+
+  <div class="ai-hero-section-{{ ai_gen_id }}__content-wrapper">
+    {% if block.settings.heading != blank %}
+      <h2 class="ai-hero-section-{{ ai_gen_id }}__heading">
+        {{ block.settings.heading }}
+      </h2>
+    {% endif %}
+
+    {% if block.settings.body_text != blank %}
+      <div class="ai-hero-section-{{ ai_gen_id }}__body">
+        {{ block.settings.body_text }}
+      </div>
+    {% endif %}
+
+    <div class="ai-hero-section-{{ ai_gen_id }}__signup-wrapper">
+      {%- form 'contact' -%}
+        <input
+          type="hidden"
+          name="contact[newsletter_signup]"
+          value="true"
+        >
+        <div class="ai-hero-section-{{ ai_gen_id }}__signup-form">
+          <div class="ai-hero-section-{{ ai_gen_id }}__input-wrapper">
+            <input
+              type="email"
+              name="contact[email]"
+              class="ai-hero-section-{{ ai_gen_id }}__input"
+              value="{{ form.email }}"
+              aria-required="true"
+              autocorrect="off"
+              autocapitalize="off"
+              autocomplete="email"
+              {% if form.errors %}
+                aria-invalid="true"
+                aria-describedby="ai-hero-section-error-{{ ai_gen_id }}"
+              {% endif %}
+              {% if form.posted_successfully? %}
+                aria-describedby="ai-hero-section-success-{{ ai_gen_id }}"
+              {% endif %}
+              placeholder="{{ block.settings.email_placeholder }}"
+              required
+            >
+          </div>
+          <button
+            type="submit"
+            class="ai-hero-section-{{ ai_gen_id }}__button"
+          >
+            {{ block.settings.button_text }}
+          </button>
+          {%- if form.errors -%}
+            <div
+              id="ai-hero-section-error-{{ ai_gen_id }}"
+              class="ai-hero-section-{{ ai_gen_id }}__error"
+            >
+              <span>{{ form.errors.messages.email }}</span>
+            </div>
+          {%- endif -%}
+          {%- if form.posted_successfully? -%}
+            <div
+              id="ai-hero-section-success-{{ ai_gen_id }}"
+              class="ai-hero-section-{{ ai_gen_id }}__success"
+            >
+              <span>{{ block.settings.success_message }}</span>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endform -%}
+    </div>
+  </div>
+</hero-section-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class HeroSection{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.style.display = 'block';
+      }
+    }
+
+    customElements.define('hero-section-{{ ai_gen_id }}', HeroSection{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Hero with email signup",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section size"
+    },
+    {
+      "type": "range",
+      "id": "section_min_height",
+      "label": "Minimum height",
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "section_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_padding_left",
+      "label": "Left",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_padding_right",
+      "label": "Right",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Image"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0.5
+    },
+    {
+      "type": "header",
+      "content": "Content padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_left_mobile",
+      "label": "Left",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right_mobile",
+      "label": "Right",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading text",
+      "default": "Transform your health"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Mobile size",
+      "min": 16,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Desktop size",
+      "min": 24,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Body text"
+    },
+    {
+      "type": "richtext",
+      "id": "body_text",
+      "label": "Body text",
+      "default": "<p>Premium health supplements designed to support your wellness journey.</p>"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "body_size_mobile",
+      "label": "Mobile size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "body_size_desktop",
+      "label": "Desktop size",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "body_spacing",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Email signup"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "Enter your email"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Sign up"
+    },
+    {
+      "type": "richtext",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "<p>Thanks for signing up!</p>"
+    },
+    {
+      "type": "range",
+      "id": "signup_max_width",
+      "label": "Max width",
+      "min": 200,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Input style"
+    },
+    {
+      "type": "color",
+      "id": "input_background",
+      "label": "Background",
+      "default": "rgba(255, 255, 255, 0.1)"
+    },
+    {
+      "type": "color",
+      "id": "input_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_placeholder_color",
+      "label": "Placeholder color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Border color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_focus_color",
+      "label": "Focus border color",
+      "default": "#442243"
+    },
+    {
+      "type": "range",
+      "id": "input_border_width",
+      "label": "Border width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "input_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Background",
+      "default": "#442243"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Hover background",
+      "default": "#19199a"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Messages"
+    },
+    {
+      "type": "color",
+      "id": "success_color",
+      "label": "Success color",
+      "default": "#4ade80"
+    },
+    {
+      "type": "color",
+      "id": "error_color",
+      "label": "Error color",
+      "default": "#ef4444"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero with email signup"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,555 @@
+{% doc %}
+  @prompt
+    Create a fully customizable Shopify section similar to “Image with text overlay”, but with advanced control over layout, sizing, and styling.
+    
+    Requirements:
+    
+    The section must allow full control of:
+    
+    Overall section width (percentage of screen)
+    
+    Section height (in pixels)
+    
+    Mobile height (in pixels)
+    
+    Text box width (percentage)
+    
+    Text box max width (pixels)
+    
+    Include an image background that:
+    
+    Fills the container
+    
+    Uses object-fit: cover
+    
+    Has an adjustable dark overlay (opacity slider)
+    
+    Add a content box (text overlay) that includes:
+    
+    Heading
+    
+    Description text
+    
+    Button
+    
+    The content box must allow:
+    
+    Background color picker
+    
+    Opacity control
+    
+    Border radius (rounded corners)
+    
+    Adjustable width and max-width
+    
+    Adjustable position (top-left, top-center, top-right, middle-left, middle-center, middle-right, bottom-left, bottom-center, bottom-right)
+    
+    Typography controls:
+    
+    Heading size (px slider)
+    
+    Text size (px slider)
+    
+    Button controls:
+    
+    Label text
+    
+    Link URL
+    
+    Background color
+    
+    Text color
+    
+    Border radius
+    
+    The button should support linking to:
+    
+    A different page OR
+    
+    A section ID on the same page (anchor link like #section-name)
+    
+    Mobile responsiveness:
+    
+    Text box should go full width on mobile
+    
+    Font sizes should scale down slightly
+    
+    Maintain clean spacing and padding
+    
+    Styling:
+    
+    Use CSS variables for all adjustable values
+    
+    Keep the design modern, clean, and similar to premium Shopify themes
+    
+    Ensure proper spacing and alignment
+    
+    Code requirements:
+    
+    Must be written as a Shopify section (.liquid)
+    
+    Include full {% schema %} with all settings
+    
+    No external libraries
+    
+    Clean, production-ready code
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-hero-overlay-{{ ai_gen_id }} {
+    position: relative;
+    width: {{ block.settings.section_width }}%;
+    height: {{ block.settings.section_height }}px;
+    overflow: hidden;
+    display: block;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }};
+    pointer-events: none;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    padding: 20px;
+    z-index: 1;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper--top-left {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper--top-center {
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper--top-right {
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper--middle-left {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper--middle-center {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper--middle-right {
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper--bottom-left {
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper--bottom-center {
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper--bottom-right {
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__content-box {
+    background-color: {{ block.settings.content_bg_color }};
+    opacity: {{ block.settings.content_opacity | divided_by: 100.0 }};
+    border-radius: {{ block.settings.content_border_radius }}px;
+    padding: 32px;
+    width: {{ block.settings.content_width }}%;
+    max-width: {{ block.settings.content_max_width }}px;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__heading {
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.heading_color }};
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__description {
+    font-size: {{ block.settings.text_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__button {
+    display: inline-block;
+    padding: 14px 28px;
+    background-color: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .ai-hero-overlay-{{ ai_gen_id }}__button:hover {
+    background-color: {{ block.settings.button_hover_bg_color }};
+    color: {{ block.settings.button_hover_text_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-hero-overlay-{{ ai_gen_id }} {
+      height: {{ block.settings.mobile_height }}px;
+    }
+
+    .ai-hero-overlay-{{ ai_gen_id }}__content-box {
+      width: 100%;
+      max-width: 100%;
+      padding: 24px;
+    }
+
+    .ai-hero-overlay-{{ ai_gen_id }}__heading {
+      font-size: {{ block.settings.heading_size | times: 0.7 }}px;
+    }
+
+    .ai-hero-overlay-{{ ai_gen_id }}__description {
+      font-size: {{ block.settings.text_size | times: 0.9 }}px;
+    }
+
+    .ai-hero-overlay-{{ ai_gen_id }}__content-wrapper {
+      padding: 16px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-hero-overlay-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-hero-overlay-{{ ai_gen_id }}__background">
+    {% if block.settings.background_image %}
+      <img
+        src="{{ block.settings.background_image | image_url: width: 2000 }}"
+        alt="{{ block.settings.background_image.alt | escape }}"
+        class="ai-hero-overlay-{{ ai_gen_id }}__image"
+        loading="lazy"
+        width="{{ block.settings.background_image.width }}"
+        height="{{ block.settings.background_image.height }}"
+      >
+    {% else %}
+      <div class="ai-hero-overlay-{{ ai_gen_id }}__placeholder">
+        {{ 'hero-apparel-1' | placeholder_svg_tag }}
+      </div>
+    {% endif %}
+    <div class="ai-hero-overlay-{{ ai_gen_id }}__overlay"></div>
+  </div>
+
+  <div class="ai-hero-overlay-{{ ai_gen_id }}__content-wrapper ai-hero-overlay-{{ ai_gen_id }}__content-wrapper--{{ block.settings.content_position }}">
+    <div class="ai-hero-overlay-{{ ai_gen_id }}__content-box">
+      {% if block.settings.heading != blank %}
+        <h2 class="ai-hero-overlay-{{ ai_gen_id }}__heading">{{ block.settings.heading }}</h2>
+      {% endif %}
+
+      {% if block.settings.description != blank %}
+        <div class="ai-hero-overlay-{{ ai_gen_id }}__description">{{ block.settings.description }}</div>
+      {% endif %}
+
+      {% if block.settings.button_label != blank %}
+        <a
+          href="{{ block.settings.button_link }}"
+          class="ai-hero-overlay-{{ ai_gen_id }}__button"
+        >
+          {{ block.settings.button_label }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hero with text overlay",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section dimensions"
+    },
+    {
+      "type": "range",
+      "id": "section_width",
+      "label": "Section width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "label": "Desktop height",
+      "min": 300,
+      "max": 900,
+      "step": 50,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "Mobile height",
+      "min": 200,
+      "max": 700,
+      "step": 50,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "header",
+      "content": "Background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Content box"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Width",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Max width",
+      "min": 300,
+      "max": 900,
+      "step": 50,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "color",
+      "id": "content_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "content_opacity",
+      "label": "Opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "content_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "Top left"
+        },
+        {
+          "value": "top-center",
+          "label": "Top center"
+        },
+        {
+          "value": "top-right",
+          "label": "Top right"
+        },
+        {
+          "value": "middle-left",
+          "label": "Middle left"
+        },
+        {
+          "value": "middle-center",
+          "label": "Middle center"
+        },
+        {
+          "value": "middle-right",
+          "label": "Middle right"
+        },
+        {
+          "value": "bottom-left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "bottom-center",
+          "label": "Bottom center"
+        },
+        {
+          "value": "bottom-right",
+          "label": "Bottom right"
+        }
+      ],
+      "default": "middle-center"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Premium wellness products"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Discover our range of health supplements designed to support your wellness goals."
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Link"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Background color",
+      "default": "#442243"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "Hover background color",
+      "default": "#110811"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Hover text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero with text overlay"
+    }
+  ],
+  "tag": null
+}
+{% endschema %}
