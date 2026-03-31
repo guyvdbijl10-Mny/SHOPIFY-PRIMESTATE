@@ -1,1 +1,390 @@
+{% liquid
+  assign desktop_opacity = section.settings.text_box_opacity | divided_by: 100.0
+  assign desktop_box_bg  = section.settings.text_box_color | color_modify: 'alpha', desktop_opacity
 
+  assign mobile_opacity  = section.settings.mobile_text_box_opacity | divided_by: 100.0
+  assign mobile_box_bg   = section.settings.mobile_text_box_color | color_modify: 'alpha', mobile_opacity
+
+  assign has_mobile_image = false
+  if section.settings.mobile_background_image != blank
+    assign has_mobile_image = true
+  endif
+%}
+
+<style>
+  #PSHeroBox-{{ section.id }} {
+    --ps-margin-top:    {{ section.settings.margin_top }}px;
+    --ps-margin-sides:  {{ section.settings.margin_sides }}px;
+    --ps-border-radius: {{ section.settings.border_radius }}px;
+    --ps-box-height:    {{ section.settings.box_height }}px;
+    --ps-max-width:     {{ section.settings.box_width }}px;
+    --ps-box-bg:        {{ desktop_box_bg }};
+  }
+
+  @media screen and (max-width: 749px) {
+    #PSHeroBox-{{ section.id }} {
+      --ps-margin-top:    {{ section.settings.mobile_margin_top }}px;
+      --ps-margin-sides:  {{ section.settings.mobile_margin_sides }}px;
+      --ps-border-radius: {{ section.settings.mobile_border_radius }}px;
+      --ps-box-height:    {{ section.settings.mobile_box_height }}px;
+      --ps-max-width:     {{ section.settings.mobile_box_width }}px;
+      --ps-box-bg:        {{ mobile_box_bg }};
+    }
+  }
+</style>
+
+<div id="PSHeroBox-{{ section.id }}" class="ps-hero-box">
+  <div class="ps-hero-box__inner">
+
+    <div class="ps-hero-box__media">
+      {%- if section.settings.background_image != blank -%}
+        {{
+          section.settings.background_image
+          | image_url: width: 3840
+          | image_tag:
+            class: 'ps-hero-box__bg-img ps-hero-box__bg-img--desktop',
+            widths: '750, 1100, 1500, 1780, 2000, 3000, 3840',
+            sizes: '100vw',
+            loading: 'lazy',
+            alt: section.settings.background_image.alt
+        }}
+      {%- else -%}
+        <div class="ps-hero-box__bg-img ps-hero-box__bg-img--desktop">
+          {{ 'hero-apparel-1' | placeholder_svg_tag: 'ps-hero-box__bg-placeholder' }}
+        </div>
+      {%- endif -%}
+
+      {%- if has_mobile_image -%}
+        {{
+          section.settings.mobile_background_image
+          | image_url: width: 1600
+          | image_tag:
+            class: 'ps-hero-box__bg-img ps-hero-box__bg-img--mobile',
+            widths: '400, 600, 750, 1000, 1200, 1600',
+            sizes: '100vw',
+            loading: 'lazy',
+            alt: section.settings.mobile_background_image.alt
+        }}
+      {%- endif -%}
+    </div>
+
+    <div class="ps-hero-box__content" style="background-color: var(--ps-box-bg);">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="ps-hero-box__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="ps-hero-box__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if section.settings.button_label != blank -%}
+        <a
+          href="{{ section.settings.button_url | default: '#' }}"
+          class="ps-hero-box__btn"
+          {% if section.settings.button_open_new_tab %}target="_blank" rel="noopener"{% endif %}
+        >
+          {{- section.settings.button_label | escape -}}
+        </a>
+      {%- endif -%}
+    </div>
+
+  </div>
+</div>
+
+{% stylesheet %}
+  .ps-hero-box {
+    margin-top: var(--ps-margin-top, 0px);
+    margin-inline: var(--ps-margin-sides, 0px);
+  }
+
+  .ps-hero-box__inner {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--ps-border-radius, 0px);
+    min-height: var(--ps-box-height, 500px);
+    max-width: var(--ps-max-width, 100%);
+    margin-inline: auto;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .ps-hero-box__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .ps-hero-box__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+  }
+
+  .ps-hero-box__bg-placeholder {
+    width: 100%;
+    height: 100%;
+  }
+
+  .ps-hero-box__bg-img--mobile {
+    display: none;
+    position: absolute;
+    inset: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ps-hero-box:has(.ps-hero-box__bg-img--mobile) .ps-hero-box__bg-img--desktop {
+      display: none;
+    }
+
+    .ps-hero-box__bg-img--mobile {
+      display: block;
+    }
+  }
+
+  .ps-hero-box__content {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+    margin: 2rem;
+    border-radius: calc(var(--ps-border-radius, 0px) * 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .ps-hero-box__heading {
+    margin: 0;
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  .ps-hero-box__text {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .ps-hero-box__btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: currentColor;
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: opacity 0.2s ease;
+    align-self: flex-start;
+  }
+
+  .ps-hero-box__btn:hover {
+    opacity: 0.85;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "PrimeState Hero Box",
+  "tag": "section",
+  "class": "ps-hero-box-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "— SHARED CONTENT ——————————"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Premium wellness products"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Body text",
+      "default": "<p>Discover our range of health supplements designed to support your wellness goals.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Learn more"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button link",
+      "info": "Leave blank for now — set your destination later."
+    },
+    {
+      "type": "checkbox",
+      "id": "button_open_new_tab",
+      "label": "Open link in new tab",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "— DESKTOP ———————————————"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Desktop background image"
+    },
+    {
+      "type": "color",
+      "id": "text_box_color",
+      "label": "Text box background colour",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "text_box_opacity",
+      "label": "Text box opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 85,
+      "info": "Only the box background dims — text stays fully visible."
+    },
+    {
+      "type": "range",
+      "id": "box_width",
+      "label": "Max width",
+      "min": 400,
+      "max": 2400,
+      "step": 20,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "box_height",
+      "label": "Height",
+      "min": 200,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margin top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_sides",
+      "label": "Margin sides",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "— MOBILE ————————————————"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_background_image",
+      "label": "Mobile background image",
+      "info": "If left blank, the desktop image is used on mobile too."
+    },
+    {
+      "type": "color",
+      "id": "mobile_text_box_color",
+      "label": "Text box background colour",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_text_box_opacity",
+      "label": "Text box opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 85,
+      "info": "Only the box background dims — text stays fully visible."
+    },
+    {
+      "type": "range",
+      "id": "mobile_box_width",
+      "label": "Max width",
+      "min": 200,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "mobile_box_height",
+      "label": "Height",
+      "min": 200,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "mobile_margin_top",
+      "label": "Margin top",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_margin_sides",
+      "label": "Margin sides",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "PrimeState Hero Box"
+    }
+  ]
+}
+{% endschema %}
