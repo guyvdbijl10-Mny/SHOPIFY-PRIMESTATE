@@ -383,7 +383,7 @@
       "name": "t:names.products_grid",
       "settings": {
         "collection": "vitamins-and-supplements-example-products",
-        "layout_type": "carousel",
+        "layout_type": "grid",
         "carousel_on_mobile": false,
         "max_products": 4,
         "columns": 4,
