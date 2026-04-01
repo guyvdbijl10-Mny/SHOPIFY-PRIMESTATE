@@ -815,40 +815,6 @@
     },
     "177391315766341472": {
       "type": "_blocks",
-      "blocks": {
-        "ai_gen_block_870099b_FTWRw7": {
-          "type": "ai_gen_block_870099b",
-          "settings": {
-            "section_width": 100,
-            "section_height": 600,
-            "mobile_height": 400,
-            "overlay_opacity": 30,
-            "content_width": 50,
-            "content_max_width": 600,
-            "content_bg_color": "#ffffff",
-            "content_opacity": 90,
-            "content_border_radius": 8,
-            "content_position": "middle-center",
-            "heading": "Premium wellness products",
-            "description": "Discover our range of health supplements designed to support your wellness goals.",
-            "heading_size": 48,
-            "heading_color": "#000000",
-            "text_size": 16,
-            "text_color": "#000000",
-            "button_label": "Shop now",
-            "button_link": "",
-            "button_bg_color": "#442243",
-            "button_text_color": "#ffffff",
-            "button_hover_bg_color": "#110811",
-            "button_hover_text_color": "#ffffff",
-            "button_border_radius": 0
-          },
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "ai_gen_block_870099b_FTWRw7"
-      ],
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -880,6 +846,46 @@
     "177019794919b6b8a0": {
       "type": "_blocks",
       "blocks": {
+        "ai_gen_block_8e46f4a_QnApL9": {
+          "type": "ai_gen_block_8e46f4a",
+          "settings": {
+            "background_image": "shopify://shop_images/vitamins-supplements-minimal-5.jpg",
+            "image_height_desktop": 500,
+            "image_height_mobile": 400,
+            "image_border_radius": 0,
+            "image_border_radius_mobile": 0,
+            "heading": "Your heading here",
+            "subtext": "Add your message or description",
+            "text_alignment": "center",
+            "text_color": "#ffffff",
+            "heading_size": 48,
+            "heading_size_mobile": 32,
+            "subtext_size": 18,
+            "subtext_size_mobile": 16,
+            "text_spacing": 16,
+            "show_button": true,
+            "button_text": "Learn more",
+            "button_link": "",
+            "button_spacing": 20,
+            "button_background_color": "#314c36",
+            "button_text_color": "#ffffff",
+            "button_hover_background_color": "#19199a",
+            "button_hover_text_color": "#ffffff",
+            "button_font_size": 16,
+            "button_font_size_mobile": 14,
+            "button_padding_vertical": 12,
+            "button_padding_horizontal": 24,
+            "button_border_radius": 4,
+            "text_box_color": "#000000",
+            "text_box_opacity": 50,
+            "text_box_width_desktop": 60,
+            "text_box_width_mobile": 90,
+            "text_box_padding": 30,
+            "text_box_border_radius": 8,
+            "text_box_border_radius_mobile": 8
+          },
+          "blocks": {}
+        },
         "ai_gen_block_7bd0876_xA3RVm": {
           "type": "ai_gen_block_7bd0876",
           "settings": {
@@ -904,6 +910,7 @@
         }
       },
       "block_order": [
+        "ai_gen_block_8e46f4a_QnApL9",
         "ai_gen_block_7bd0876_xA3RVm"
       ],
       "settings": {
