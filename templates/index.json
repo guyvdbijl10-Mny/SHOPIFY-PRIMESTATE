@@ -395,8 +395,8 @@
         "icons_shape": "none",
         "section_width": "page-width",
         "horizontal_alignment": "flex-start",
-        "gap": 28,
-        "color_scheme": "scheme-1",
+        "gap": 2,
+        "color_scheme": "scheme-a033677a-3ec5-433a-a475-937b41114e0e",
         "padding-block-start": 72,
         "padding-block-end": 72
       }
